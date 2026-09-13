@@ -1,0 +1,27 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="UTF-8">
+<title>테스트</title>
+</head>
+<body>
+
+<h1>교정기 앱 테스트</h1>
+
+<button onclick="wear()">장착</button>
+<button onclick="removeBrace()">해제</button>
+
+<p id="status">미착용</p>
+
+<script>
+function wear(){
+  document.getElementById("status").innerHTML="착용중";
+}
+
+function removeBrace(){
+  document.getElementById("status").innerHTML="미착용";
+}
+</script>
+
+</body>
+</html>
