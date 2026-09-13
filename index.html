@@ -39,6 +39,13 @@ text-align:center;
 <button onclick="removeBrace()">해제</button>
 
 <h2 id="status">미착용</h2>
+<p id="liveTime">
+현재 착용시간: 0시간 0분 0초
+</p>
+
+<p id="remainTime">
+목표까지 남은 시간: 14시간 0분
+</p>
 
 <p id="total">오늘 총 착용시간: 0분</p>
 
@@ -121,13 +128,37 @@ function update(){
 
 let data=loadData();
 
+let currentTotal=data.total;
+
+if(startTime){
+currentTotal+=Date.now()-startTime;
+}
+
 let mins=
-Math.floor(data.total/60000);
+Math.floor(currentTotal/60000);
+
 
 document.getElementById("total")
 .innerHTML=
 "오늘 총 착용시간: "
 +mins+"분";
+let remain=
+Math.max(
+0,
+14*60-Math.floor(currentTotal/60000)
+);
+
+let remainH=
+Math.floor(remain/60);
+
+let remainM=
+remain%60;
+
+document.getElementById("remainTime")
+.innerHTML=
+"목표까지 남은 시간: "
++remainH+"시간 "
++remainM+"분";
 
 let rate=
 Math.min(
@@ -148,6 +179,37 @@ let html="";
 data.logs.forEach(x=>{
 html+="<li>"+x+"</li>";
 });
+if(startTime){
+
+let elapsed=
+Date.now()-startTime;
+
+let h=
+Math.floor(elapsed/3600000);
+
+let m=
+Math.floor(
+(elapsed%3600000)/60000
+);
+
+let s=
+Math.floor(
+(elapsed%60000)/1000
+);
+
+document.getElementById("liveTime")
+.innerHTML=
+"현재 착용시간: "
++h+"시간 "
++m+"분 "
++s+"초";
+
+}else{
+
+document.getElementById("liveTime")
+.innerHTML=
+"현재 착용시간: 0시간 0분 0초";
+}
 
 document.getElementById("logs")
 .innerHTML=html;
