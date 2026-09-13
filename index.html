@@ -1,26 +1,160 @@
 <!DOCTYPE html>
-<html>
+<html lang="ko">
 <head>
 <meta charset="UTF-8">
-<title>테스트</title>
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>교정기 기록기</title>
+<style>
+body{
+font-family:sans-serif;
+padding:20px;
+max-width:600px;
+margin:auto;
+}
+button{
+padding:12px;
+font-size:18px;
+margin:5px;
+}
+#progress{
+width:100%;
+height:25px;
+background:#ddd;
+margin-top:10px;
+}
+#bar{
+height:100%;
+width:0%;
+background:green;
+color:white;
+text-align:center;
+}
+</style>
 </head>
 <body>
 
-<h1>교정기 앱 테스트</h1>
+<h1>교정기 기록기</h1>
 
 <button onclick="wear()">장착</button>
 <button onclick="removeBrace()">해제</button>
 
-<p id="status">미착용</p>
+<h2 id="status">미착용</h2>
+
+<p id="total">오늘 총 착용시간: 0분</p>
+
+<div id="progress">
+<div id="bar">0%</div>
+</div>
+
+<h3>기록</h3>
+<ul id="logs"></ul>
 
 <script>
+
+let startTime=null;
+
+function loadData(){
+return JSON.parse(
+localStorage.getItem("braceData")
+|| '{"total":0,"logs":[]}'
+);
+}
+
+function saveData(data){
+localStorage.setItem(
+"braceData",
+JSON.stringify(data)
+);
+}
+
 function wear(){
-  document.getElementById("status").innerHTML="착용중";
+
+if(startTime){
+alert("이미 착용중");
+return;
+}
+
+startTime=Date.now();
+
+document.getElementById("status")
+.innerHTML="착용중";
 }
 
 function removeBrace(){
-  document.getElementById("status").innerHTML="미착용";
+
+if(!startTime){
+alert("먼저 장착 버튼");
+return;
 }
+
+let end=Date.now();
+
+let diff=end-startTime;
+
+let data=loadData();
+
+data.total+=diff;
+
+let mins=
+Math.floor(diff/60000);
+
+data.logs.push(
+new Date(startTime)
+.toLocaleTimeString()
++" ~ "
++new Date(end)
+.toLocaleTimeString()
++" ("+mins+"분)"
+);
+
+saveData(data);
+
+startTime=null;
+
+document.getElementById("status")
+.innerHTML="미착용";
+
+update();
+}
+
+function update(){
+
+let data=loadData();
+
+let mins=
+Math.floor(data.total/60000);
+
+document.getElementById("total")
+.innerHTML=
+"오늘 총 착용시간: "
++mins+"분";
+
+let rate=
+Math.min(
+100,
+(data.total/(14*60*60*1000))*100
+);
+
+document.getElementById("bar")
+.style.width=
+rate+"%";
+
+document.getElementById("bar")
+.innerHTML=
+rate.toFixed(1)+"%";
+
+let html="";
+
+data.logs.forEach(x=>{
+html+="<li>"+x+"</li>";
+});
+
+document.getElementById("logs")
+.innerHTML=html;
+}
+
+update();
+
 </script>
 
 </body>
